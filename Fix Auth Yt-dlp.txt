@@ -1,0 +1,47 @@
+حل مشكله اليوتيوب  في السيرفر
+
+
+python3 -m pip install -U https://github.com/coletdjnz/yt-dlp-youtube-oauth2/archive/refs/heads/master.zip
+
+
+yt-dlp --username oauth2 --password '' -F حط لينك يوتيوب مساحته كبيره جدا 10ساعات مثلا && clear
+
+
+yt-dlp --username oauth2 --password '' -F https://youtu.be/f1A7SdVTlok?si=W_-CDprFGC4O4dsZ && clear
+
+
+https://www.google.com/device
+بتعمل بعدها AUTH وبعدها بسكد
+
+
+
+
+
+
+
+
+
+في ملف play.py
+
+async def download(bot_username, link, video: Union[bool, str] = None):
+    link = link
+    loop = asyncio.get_running_loop()
+    def audio_dl():
+        ydl_opts = {"format": "bestaudio/best", "outtmpl": f"Music/{bot_username}/%(id)s.%(ext)s", "geo_bypass": True, "nocheckcertificate": True, "quiet": True, "no_warnings": True, "username": "oauth2", "password" : ""}
+        x = yt_dlp.YoutubeDL(ydl_opts)
+        info = x.extract_info(link, False)
+        xyz = os.path.join(f"Music/{bot_username}/{info['id']}.{info['ext']}")
+        if os.path.exists(xyz):
+            return xyz
+        x.download([link])
+        return xyz
+    if video:
+        proc = await asyncio.create_subprocess_exec("yt-dlp", "--username oauth2", "--password ''", "-g", "-f", "best[height<=?720][width<=?1280]", f"{link}", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+        stdout, stderr = await proc.communicate()
+        if stdout:
+            downloaded_file = stdout.decode().split("\n")[0]
+        else:
+            return
+    else:
+        downloaded_file = await loop.run_in_executor(None, audio_dl)
+    return downloaded_file
